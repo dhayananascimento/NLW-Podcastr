@@ -63,9 +63,28 @@ export default function Episode({ episode }: EpisodeProps) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const { data } = await api.get("episodes", {
+    params: {
+      _limit: 2,
+      _sort: "published_at",
+      _order: "desc",
+    },
+  });
+
+  const paths = data.map((episode) => {
+    return {
+      params: {
+        slug: episode.id,
+      },
+    };
+  });
+
   return {
-    paths: [],
+    paths,
     fallback: "blocking",
+    // false: retorna 404 caso não ache os slugs/paginas pré estabelecidas pra carregarem
+    // true: tenta carregar as paginas, mas do lado do client/Browser (mais demorado)
+    // blocking: o usuário so é redirecionado para a página quando os dados estão carregados (pelo nodejs/next)
   };
 };
 
